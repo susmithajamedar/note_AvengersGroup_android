@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">note_AvengersGroup_android</string>
+    <string name="please_select_the_one_option">Please select the one option</string>
+    <string name="from_photos">From photos</string>
+    <string name="cancel">Cancel</string>
 </resources>
