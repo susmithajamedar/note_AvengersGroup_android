@@ -70,7 +70,31 @@ public class DataBase extends SQLiteOpenHelper {
         return true;
     }
 
-    
+    public ArrayList<NoteModel> getAllNote(String category) {
+        ArrayList<NoteModel> array_list = new ArrayList<NoteModel>();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res = db.rawQuery("select * from " + Constants.TABLE_NOTES + " where category='" + category + "'", null);
+        res.moveToFirst();
+
+        while (res.isAfterLast() == false) {
+            NoteModel noteModel = new NoteModel();
+            noteModel.setId(res.getInt(res.getColumnIndex("id")));
+            noteModel.setCategory(res.getString(res.getColumnIndex("category")));
+            noteModel.setNote(res.getString(res.getColumnIndex("note")));
+            noteModel.setAnnotation(res.getString(res.getColumnIndex("annotation")));
+            noteModel.setImageOne(res.getString(res.getColumnIndex("imageOne")));
+            noteModel.setImageTwo(res.getString(res.getColumnIndex("imageTwo")));
+            noteModel.setAudio(res.getString(res.getColumnIndex("audio")));
+            noteModel.setLocation(res.getString(res.getColumnIndex("location")));
+            noteModel.setDate(res.getString(res.getColumnIndex("date")));
+            array_list.add(noteModel);
+            res.moveToNext();
+        }
+        return array_list;
+    }
+
+
 
 
 }
