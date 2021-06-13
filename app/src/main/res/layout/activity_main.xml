@@ -18,6 +18,8 @@ tools:context=".MainActivity">
         android:textColor="@color/black"
         android:textSize="20dp"
         android:layout_alignParentLeft="true"
+
+        android:paddingLeft="20dp"
         android:layout_centerVertical="true"
         />
 
