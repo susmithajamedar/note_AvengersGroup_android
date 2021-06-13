@@ -1,8 +1,12 @@
 package com.example.note_avengersgroup_android.utils;
 
 import android.app.Activity;
+import android.content.ContentValues;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import java.util.ArrayList;
 
 public class DataBase extends SQLiteOpenHelper {
 
@@ -26,5 +30,26 @@ public class DataBase extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
+    }
+
+    public boolean insertCategory(String name) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("category", name);
+        db.insert(Constants.TABLE_CATEGORY, null, contentValues);
+        return true;
+    }
+
+    public ArrayList<String> getAllCategories() {
+        ArrayList<String> array_list = new ArrayList<String>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res = db.rawQuery("select * from " + Constants.TABLE_CATEGORY, null);
+        res.moveToFirst();
+
+        while (res.isAfterLast() == false) {
+            array_list.add(res.getString(res.getColumnIndex("category")));
+            res.moveToNext();
+        }
+        return array_list;
     }
 }
