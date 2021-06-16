@@ -80,7 +80,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
                 android:layout_marginTop="10dp"
-                android:text="Tilte"
+                android:text="Title"
                 android:textColor="@color/black"
                 android:textSize="14dp" />
 

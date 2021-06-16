@@ -36,9 +36,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.dialog_add_attachment);
+        setContentView(R.layout.activity_main);
         //initialize all action item views & set  Permissions
-        //init();
+         init();
     }
 
     private void init()

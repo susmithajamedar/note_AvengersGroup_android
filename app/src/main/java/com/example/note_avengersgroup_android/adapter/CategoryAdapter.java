@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 
+import com.example.note_avengersgroup_android.NotesActivity;
 import com.example.note_avengersgroup_android.R;
 
 import java.util.List;
@@ -37,7 +38,14 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Viewho
     @Override
     public void onBindViewHolder(@NonNull  Viewholder holder, int position) {
         holder.textTV.setText(dataList.get(position));
-
+        holder.view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(activity, NotesActivity.class);
+                intent.putExtra("selected_category", dataList.get(position));
+                activity.startActivity(intent);
+            }
+        });
     }
 
     @Override
