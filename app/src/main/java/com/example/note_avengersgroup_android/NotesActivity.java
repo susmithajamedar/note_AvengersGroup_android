@@ -6,8 +6,10 @@ import android.view.View;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.note_avengersgroup_android.utils.Constants;
+import com.example.note_avengersgroup_android.utils.DataBase;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 public class NotesActivity extends AppCompatActivity implements View.OnClickListener {
@@ -16,7 +18,9 @@ public class NotesActivity extends AppCompatActivity implements View.OnClickList
     TextView sortBy;
     TextView addTV;
 
+    DataBase dataBase;
 
+    RecyclerView notesRV;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,12 +29,14 @@ public class NotesActivity extends AppCompatActivity implements View.OnClickList
         init();
     }
     public void init() {
+        dataBase = new DataBase(this);
         backTV = findViewById(R.id.backTV);
-        addTV = findViewById(R.id.addTV);
         backTV.setOnClickListener(this);
+        addTV = findViewById(R.id.addTV);
         addTV.setOnClickListener(this);
         sortBy = findViewById(R.id.sort_by_date);
         sortBy.setOnClickListener(this);
+        notesRV = findViewById(R.id.notesRV);
     }
     @Override
     public void onClick(View v) {
