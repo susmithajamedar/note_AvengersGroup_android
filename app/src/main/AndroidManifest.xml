@@ -11,6 +11,7 @@
         android:theme="@style/Theme.Note_AvengersGroup_android">
 
         <activity android:name=".NotesActivity" />
+        <activity android:name=".AddNotesActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
