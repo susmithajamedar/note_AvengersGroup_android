@@ -94,7 +94,19 @@ public class DataBase extends SQLiteOpenHelper {
         return array_list;
     }
 
+    public int updateNote(NoteModel noteModel, int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
 
+        ContentValues values = new ContentValues();
+        values.put("note", noteModel.getNote());
+        values.put("annotation", noteModel.getAnnotation());
+        values.put("imageOne", noteModel.getImageOne());
+        values.put("imageTwo", noteModel.getImageTwo());
+        values.put("audio", noteModel.getAudio());
+        values.put("location", noteModel.getLocation());
+        values.put("category", noteModel.getCategory());
+        return db.update(Constants.TABLE_NOTES, values, "id" + " =?", new String[]{String.valueOf(id)});
+    }
 
 
 }
