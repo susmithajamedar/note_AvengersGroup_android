@@ -2,7 +2,10 @@ package com.example.note_avengersgroup_android;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,9 +20,8 @@ public class NotesActivity extends AppCompatActivity implements View.OnClickList
     TextView backTV;
     TextView sortBy;
     TextView addTV;
-
+    EditText searchET;
     DataBase dataBase;
-
     RecyclerView notesRV;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +29,23 @@ public class NotesActivity extends AppCompatActivity implements View.OnClickList
         setContentView(R.layout.activity_notes);
         category = getIntent().getStringExtra("selected_category");
         init();
+        searchET.addTextChangedListener(new TextWatcher(){
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
     }
     public void init() {
         dataBase = new DataBase(this);
@@ -34,6 +53,7 @@ public class NotesActivity extends AppCompatActivity implements View.OnClickList
         backTV.setOnClickListener(this);
         addTV = findViewById(R.id.addTV);
         addTV.setOnClickListener(this);
+        searchET = findViewById(R.id.searchET);
         sortBy = findViewById(R.id.sort_by_date);
         sortBy.setOnClickListener(this);
         notesRV = findViewById(R.id.notesRV);
