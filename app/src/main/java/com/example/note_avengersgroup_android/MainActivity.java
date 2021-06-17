@@ -30,8 +30,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     List<String> dataList;
     CategoryAdapter adapter;
 
+    private static final int CAMERA_PERMISSION_CODE = 100;
     private static final int STORAGE_PERMISSION_CODE = 101;
-
+    private static final int LOCATION_PERMISSION = 102;
     // start point of the default view
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,6 +132,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                            @NonNull int[] grantResults)
     {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == CAMERA_PERMISSION_CODE) {
+
+            // Checking whether user granted the permission or not.
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Showing the toast message
+                Toast.makeText(MainActivity.this, "Camera Permission Granted", Toast.LENGTH_SHORT).show();
+            }
+            else {
+                Toast.makeText(MainActivity.this, "Camera Permission Denied", Toast.LENGTH_SHORT).show();
+            }
+        }
+        else if (requestCode == STORAGE_PERMISSION_CODE) {
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(MainActivity.this, "Storage Permission Granted", Toast.LENGTH_SHORT).show();
+                checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, LOCATION_PERMISSION);
+
+            }
+            else {
+                Toast.makeText(MainActivity.this, "Storage Permission Denied", Toast.LENGTH_SHORT).show();
+                checkPermission(Manifest.permission.ACCESS_FINE_LOCATION, LOCATION_PERMISSION);
+
+            }
+        }
+        else if (requestCode == LOCATION_PERMISSION) {
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(MainActivity.this, "Location Permission Granted", Toast.LENGTH_SHORT).show();
+            }
+            else {
+                Toast.makeText(MainActivity.this, "Location Permission Denied", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
     @Override
     public void onClick(View v)
