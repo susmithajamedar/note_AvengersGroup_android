@@ -11,9 +11,14 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.note_avengersgroup_android.adapter.NoteAdapter;
+import com.example.note_avengersgroup_android.models.NoteModel;
 import com.example.note_avengersgroup_android.utils.Constants;
 import com.example.note_avengersgroup_android.utils.DataBase;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class NotesActivity extends AppCompatActivity implements View.OnClickListener {
     String category;
@@ -23,6 +28,11 @@ public class NotesActivity extends AppCompatActivity implements View.OnClickList
     EditText searchET;
     DataBase dataBase;
     RecyclerView notesRV;
+
+    ArrayList<NoteModel> dataList;
+
+    List<NoteModel> sortedList = new ArrayList<>();
+    List<NoteModel> searchingList = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,17 +42,27 @@ public class NotesActivity extends AppCompatActivity implements View.OnClickList
         searchET.addTextChangedListener(new TextWatcher(){
 
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
             }
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                String searchText = String.valueOf(charSequence);
+                if (searchingList.size() > 0) {
+                    searchingList.clear();
+                }
+                for (int j = 0; j < sortedList.size(); j++) {
+                    if (sortedList.get(j).getNote().contains(searchText)) {
+                        searchingList.add(sortedList.get(j));
+                    }
+                }
+                NoteAdapter adapter = new NoteAdapter(NotesActivity.this, searchingList);
+                notesRV.setAdapter(adapter);
             }
 
             @Override
-            public void afterTextChanged(Editable s) {
+            public void afterTextChanged(Editable editable) {
 
             }
         });
