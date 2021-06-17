@@ -18,7 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
         android:layout_below="@+id/addTV"
-        android:layout_marginTop="@dimen/h5"
+        android:layout_marginTop="16dp"
         android:background="@color/black" />
 
     <LinearLayout
