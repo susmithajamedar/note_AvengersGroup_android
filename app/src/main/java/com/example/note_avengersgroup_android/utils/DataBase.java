@@ -108,5 +108,12 @@ public class DataBase extends SQLiteOpenHelper {
         return db.update(Constants.TABLE_NOTES, values, "id" + " =?", new String[]{String.valueOf(id)});
     }
 
+    public int deleteNote(int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        int i = db.delete(Constants.TABLE_NOTES, "id" + "=?", new String[]{String.valueOf(id)});
+        db.close();
+        return i;
+    }
+
 
 }
