@@ -1,6 +1,7 @@
 package com.example.note_avengersgroup_android;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -8,7 +9,9 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.note_avengersgroup_android.adapter.NoteAdapter;
@@ -18,6 +21,7 @@ import com.example.note_avengersgroup_android.utils.DataBase;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class NotesActivity extends AppCompatActivity implements View.OnClickListener {
@@ -78,9 +82,49 @@ public class NotesActivity extends AppCompatActivity implements View.OnClickList
         sortBy.setOnClickListener(this);
         notesRV = findViewById(R.id.notesRV);
     }
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void setDataByName() {
+        sortedList.clear();
+        notesRV.setLayoutManager(new LinearLayoutManager(this));
+        dataList = dataBase.getAllNote(category);
+        //Collections.reverse(dataList);
+        List<String> list = new ArrayList<>();
+        for (int i = 0; i <= dataList.size() - 1; i++) {
+            list.add(dataList.get(i).getNote());
+        }
+        list.sort(Comparator.comparing(String::toString));
+        for (int k = 0; k < list.size(); k++) {
+            for (int j = 0; j < list.size(); j++) {
+                if (list.get(k).equals(dataList.get(j).getNote())) {
+                    sortedList.add(dataList.get(j));
+                }
+            }
+
+        }
+        NoteAdapter adapter = new NoteAdapter(this, sortedList);
+        notesRV.setAdapter(adapter);
+    }
+
+    private void setDataDate() {
+        sortedList.clear();
+        notesRV.setLayoutManager(new LinearLayoutManager(this));
+        dataList = dataBase.getAllNote(category);
+        //Collections.reverse(dataList);
+        sortedList.addAll(dataList);
+        NoteAdapter adapter = new NoteAdapter(this, dataList);
+        notesRV.setAdapter(adapter);
+    }
+
     @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
+    protected void onResume() {
+        super.onResume();
+        sortBy.setText("Sort by date");
+        setDataDate();
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
             case R.id.backTV:
                 finish();
                 break;
@@ -90,11 +134,9 @@ public class NotesActivity extends AppCompatActivity implements View.OnClickList
                 intent.putExtra(Constants.FLAG, "add");
                 startActivity(intent);
                 break;
-
             case R.id.sort_by_date:
                 openBottomDialog();
                 break;
-
         }
     }
 
@@ -109,17 +151,21 @@ public class NotesActivity extends AppCompatActivity implements View.OnClickList
         tvSortByDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                setDataDate();
                 sortBy.setText("Sort by date");
                 dialog.dismiss();
             }
         });
         tvSortByName.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onClick(View view) {
                 sortBy.setText("Sort by name");
+                setDataByName();
                 dialog.dismiss();
             }
         });
 
     }
-}
+
+    }
