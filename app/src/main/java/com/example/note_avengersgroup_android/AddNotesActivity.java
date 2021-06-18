@@ -127,6 +127,13 @@ public class AddNotesActivity extends AppCompatActivity implements View.OnClickL
             case R.id.cameraTV:
                 openBottomDialog();
                 break;
+            case R.id.audioTV:
+                Intent intent_upload = new Intent();
+                intent_upload.setType("audio/*");
+                intent_upload.setAction(Intent.ACTION_GET_CONTENT);
+                intent_upload.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+                startActivityForResult(intent_upload, 1);
+                break;
 
         }
 
@@ -180,5 +187,133 @@ public class AddNotesActivity extends AppCompatActivity implements View.OnClickL
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_CODE) {
+            stringImages = data.getStringArrayListExtra(Pix.IMAGE_RESULTS);
+            setImages();
+        }
+        if (requestCode == 1) {
+            if (resultCode == RESULT_OK) {
+
+                //the selected audio.
+                Uri uri = data.getData();
+                selectedAudioTV.setVisibility(View.VISIBLE);
+                selectedAudio = uri.toString();
+                try {
+                    InputStream is = getContentResolver().openInputStream(data.getData());
+                    model.setAudio(writeStreamToFile(is));
+                } catch (Exception e) {
+
+                }
+
+                File file = new File(selectedAudio);
+                selectedAudioTV.setText(file.getName());
+
+                Uri playUri = Uri.parse(selectedAudio);
+
+
+                try {
+                    mediaPlayer.setDataSource(this, playUri);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    mediaPlayer.prepare();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                mediaPlayer.start();
+            }
+        }
+        if (requestCode == Constants.PICK_IMAGE) {
+            if (resultCode == RESULT_OK) {
+                selectedIV.setImageURI(data.getData());
+                //File f = new File(getRealPathFromURI(AddNotesActivity.this,data.getData()));
+                Uri uri = data.getData();
+                try {
+                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+                    model.setImageOne(saveToInternalStorage(bitmap));
+                } catch (Exception e) {
+
+                }
+
+
+            }
+        }
+    }
+    public void setImages() {
+        for (int i = 0; i < stringImages.size(); i++) {
+            File imgFile = new File(stringImages.get(i));
+            if (imgFile.exists()) {
+                if (i == 0) {
+                    model.setImageOne(stringImages.get(i));
+                    Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+                    selectedIV.setImageBitmap(myBitmap);
+                } else if (i == 1) {
+                    model.setImageTwo(stringImages.get(i));
+                    selectedTwoIV.setVisibility(View.VISIBLE);
+                    Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+                    selectedTwoIV.setImageBitmap(myBitmap);
+                }
+            }
+        }
+    }
+    private String saveToInternalStorage(Bitmap bitmapImage) {
+        //File directory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        File directory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString()
+                + "/note_photo");
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+        String imageFileName = "cropped_" + timeStamp + ".jpeg";
+        File mypath = new File(directory, imageFileName);
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(mypath);
+            bitmapImage.compress(Bitmap.CompressFormat.JPEG, 70, fos);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                fos.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return mypath.getAbsolutePath();
+    }
+
+    private String writeStreamToFile(InputStream input) {
+
+        File directory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString()
+                + "/note_audio");
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+        String imageFileName = timeStamp + ".mp3";
+        File file = new File(directory, imageFileName);
+        try {
+            try (OutputStream output = new FileOutputStream(file)) {
+                byte[] buffer = new byte[4 * 1024]; // or other buffer size
+                int read;
+                while ((read = input.read(buffer)) != -1) {
+                    output.write(buffer, 0, read);
+                }
+                output.flush();
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                input.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return file.getAbsolutePath();
     }
 }
