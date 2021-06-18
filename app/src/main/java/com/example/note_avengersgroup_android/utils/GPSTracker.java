@@ -21,7 +21,6 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 
 public class GPSTracker extends Service implements LocationListener {
-
     private Context mContext;
     // flag for GPS status
     boolean isGPSEnabled = false;

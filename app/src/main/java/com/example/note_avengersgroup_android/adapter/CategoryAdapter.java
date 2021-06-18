@@ -26,7 +26,6 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Viewho
         this.dataList=dataList;
     }
 
-
     @NonNull
     @Override
     public Viewholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -35,9 +34,11 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.Viewho
 
         return new Viewholder(view);
     }
+
     @Override
-    public void onBindViewHolder(@NonNull  Viewholder holder, int position) {
+    public void onBindViewHolder(@NonNull Viewholder holder, int position) {
         holder.textTV.setText(dataList.get(position));
+
         holder.view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

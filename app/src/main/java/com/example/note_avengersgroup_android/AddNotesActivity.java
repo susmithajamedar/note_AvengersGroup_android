@@ -1,5 +1,6 @@
 package com.example.note_avengersgroup_android;
 
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -24,10 +25,10 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import com.fxn.pix.Options;
 import com.fxn.pix.Pix;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -48,6 +49,7 @@ import com.example.note_avengersgroup_android.models.NoteModel;
 import com.example.note_avengersgroup_android.utils.Constants;
 
 public class AddNotesActivity extends AppCompatActivity implements View.OnClickListener {
+
     TextView cameraTV, audioTV, selectedAudioTV, saveTV, tvSpinner;
     TextView tvToolBarTitle;
     Spinner spCategory;
@@ -192,7 +194,7 @@ public class AddNotesActivity extends AppCompatActivity implements View.OnClickL
                         model.setAnnotation(annotationET.getText().toString());
                         model.setLocation("" + userLat + " " + userLng);
                         model.setDate(getCurrentTime());
-                        dataBase.updateNote(model, noteModel.getId());
+                        dataBase.updateData(model, noteModel.getId());
                         finish();
                     }
                 } else {
@@ -444,4 +446,5 @@ public class AddNotesActivity extends AppCompatActivity implements View.OnClickL
         }
         return file.getAbsolutePath();
     }
+
 }

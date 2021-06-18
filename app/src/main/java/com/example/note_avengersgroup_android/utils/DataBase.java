@@ -12,11 +12,11 @@ import java.util.ArrayList;
 
 public class DataBase extends SQLiteOpenHelper {
 
+
     public DataBase(Activity activity) {
         super(activity, Constants.DATABASE_NAME, null, 1);
     }
 
-    //OnCreating Database Also create 2 Tables Category and Notes
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL(
@@ -30,9 +30,10 @@ public class DataBase extends SQLiteOpenHelper {
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
 
     }
+
 
     public boolean insertCategory(String name) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -44,6 +45,8 @@ public class DataBase extends SQLiteOpenHelper {
 
     public ArrayList<String> getAllCategories() {
         ArrayList<String> array_list = new ArrayList<String>();
+
+        //hp = new HashMap();
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor res = db.rawQuery("select * from " + Constants.TABLE_CATEGORY, null);
         res.moveToFirst();
@@ -94,7 +97,14 @@ public class DataBase extends SQLiteOpenHelper {
         return array_list;
     }
 
-    public int updateNote(NoteModel noteModel, int id) {
+    public int deleteUser(int id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        int i = db.delete(Constants.TABLE_NOTES, "id" + "=?", new String[]{String.valueOf(id)});
+        db.close();
+        return i;
+    }
+
+    public int updateData(NoteModel noteModel, int id) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -107,13 +117,5 @@ public class DataBase extends SQLiteOpenHelper {
         values.put("category", noteModel.getCategory());
         return db.update(Constants.TABLE_NOTES, values, "id" + " =?", new String[]{String.valueOf(id)});
     }
-
-    public int deleteNote(int id) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        int i = db.delete(Constants.TABLE_NOTES, "id" + "=?", new String[]{String.valueOf(id)});
-        db.close();
-        return i;
-    }
-
 
 }

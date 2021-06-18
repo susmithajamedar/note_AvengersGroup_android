@@ -23,45 +23,41 @@ import com.example.note_avengersgroup_android.utils.DataBase;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+
     TextView addTV;
     DataBase dataBase;
     RecyclerView categoryRV;
-
     List<String> dataList;
     CategoryAdapter adapter;
 
-    private static final int CAMERA_PERMISSION_CODE = 100;
-    private static final int STORAGE_PERMISSION_CODE = 101;
-    private static final int LOCATION_PERMISSION = 102;
-    // start point of the default view
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //initialize all action item views & set  Permissions
-         init();
+        init();
     }
 
-    private void init()
-    {
+    private void init(){
         dataBase=new DataBase(this);
         addTV=findViewById(R.id.addTV);
         categoryRV=findViewById(R.id.categoryRV);
         addTV.setOnClickListener(this);
         checkPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, STORAGE_PERMISSION_CODE);
+//        checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION, LOCATION_PERMISSION);
+
         setAdapter();
     }
 
-    private void setAdapter()
-    {
+
+    private void setAdapter(){
         categoryRV.setLayoutManager(new LinearLayoutManager(this));
         dataList=dataBase.getAllCategories();
         adapter=new CategoryAdapter(this,dataList);
         categoryRV.setAdapter(adapter);
     }
 
-    private void addCategoryDialog()
-    {
+
+    private void addNoteDialog(){
         Dialog dialog =new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setCancelable(false);
@@ -70,36 +66,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         TextView okTV = dialog.findViewById(R.id.okTV);
         EditText categoryET = dialog.findViewById(R.id.categoryET);
 
-        okTV.setOnClickListener(new View.OnClickListener()
-        {
+        okTV.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view)
-            {
-                if(categoryET.getText().toString().length()>0)
-                {
+            public void onClick(View view) {
+                if(categoryET.getText().toString().length()>0) {
                     dataBase.insertCategory(categoryET.getText().toString());
                     dialog.dismiss();
                     setAdapter();
                     dataSaved();
-                }
-                else
-                {
+                }else{
                     Toast.makeText(MainActivity.this,"Please Enter Category",Toast.LENGTH_LONG).show();
                 }
             }
         });
 
 
-        cancelTV.setOnClickListener(new View.OnClickListener()
-        {
+        cancelTV.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view)
-            {
+            public void onClick(View view) {
                 dialog.dismiss();
             }
         });
         dialog.show();
     }
+
+
     private void dataSaved(){
         Dialog dialog =new Dialog(this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -117,12 +108,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         dialog.show();
     }
 
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.addTV:
+                addNoteDialog();
+                break;
+        }
+    }
+
+
+    private static final int CAMERA_PERMISSION_CODE = 100;
+    private static final int STORAGE_PERMISSION_CODE = 101;
+    private static final int LOCATION_PERMISSION = 102;
 
     public void checkPermission(String permission, int requestCode)
     {
         // Checking if permission is not granted
-        if (ContextCompat.checkSelfPermission(MainActivity.this, permission) == PackageManager.PERMISSION_DENIED)
-        {
+        if (ContextCompat.checkSelfPermission(MainActivity.this, permission) == PackageManager.PERMISSION_DENIED) {
             ActivityCompat.requestPermissions(MainActivity.this, new String[] { permission }, requestCode);
         }
     }
@@ -132,6 +135,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                            @NonNull int[] grantResults)
     {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
         if (requestCode == CAMERA_PERMISSION_CODE) {
 
             // Checking whether user granted the permission or not.
@@ -166,15 +170,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
     }
-    @Override
-    public void onClick(View v)
-    {
-        switch(v.getId())
-        {
-            case R.id.addTV:
-                addCategoryDialog();
-                break;
-        }
 
-    }
 }

@@ -180,7 +180,7 @@ public class NotesDisplayActivity extends AppCompatActivity implements OnMapRead
         okTV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dataBase.deleteNote(noteModel.getId());
+                dataBase.deleteUser(noteModel.getId());
                 dialog.dismiss();
                 finish();
             }

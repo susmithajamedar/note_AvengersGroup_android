@@ -25,26 +25,26 @@ import java.util.Comparator;
 import java.util.List;
 
 public class NotesActivity extends AppCompatActivity implements View.OnClickListener {
+
     String category;
-    TextView backTV;
-    TextView sortBy;
+    TextView backTV, sortBy;
     TextView addTV;
-    EditText searchET;
     DataBase dataBase;
     RecyclerView notesRV;
-
     ArrayList<NoteModel> dataList;
-
+    EditText searchET;
     List<NoteModel> sortedList = new ArrayList<>();
     List<NoteModel> searchingList = new ArrayList<>();
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_notes);
         category = getIntent().getStringExtra("selected_category");
         init();
-        searchET.addTextChangedListener(new TextWatcher(){
 
+        searchET.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
@@ -71,18 +71,19 @@ public class NotesActivity extends AppCompatActivity implements View.OnClickList
             }
         });
     }
+
     public void init() {
         dataBase = new DataBase(this);
         backTV = findViewById(R.id.backTV);
-        backTV.setOnClickListener(this);
         addTV = findViewById(R.id.addTV);
-        addTV.setOnClickListener(this);
+        notesRV = findViewById(R.id.notesRV);
         searchET = findViewById(R.id.searchET);
         sortBy = findViewById(R.id.sort_by_date);
+        backTV.setOnClickListener(this);
+        addTV.setOnClickListener(this);
         sortBy.setOnClickListener(this);
-        notesRV = findViewById(R.id.notesRV);
     }
-    @RequiresApi(api = Build.VERSION_CODES.N)
+
     private void setDataByName() {
         sortedList.clear();
         notesRV.setLayoutManager(new LinearLayoutManager(this));
@@ -157,7 +158,6 @@ public class NotesActivity extends AppCompatActivity implements View.OnClickList
             }
         });
         tvSortByName.setOnClickListener(new View.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onClick(View view) {
                 sortBy.setText("Sort by name");
@@ -167,5 +167,4 @@ public class NotesActivity extends AppCompatActivity implements View.OnClickList
         });
 
     }
-
-    }
+}
