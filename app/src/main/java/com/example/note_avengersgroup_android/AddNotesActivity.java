@@ -1,7 +1,9 @@
 package com.example.note_avengersgroup_android;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
@@ -9,7 +11,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -62,21 +67,74 @@ public class AddNotesActivity extends AppCompatActivity implements View.OnClickL
     private String flag = null;
     private NoteModel noteModel;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_notes);
 
+        tvToolBarTitle = findViewById(R.id.tv_toolbar_title);
+
         if (getIntent() != null) {
 
             flag = getIntent().getStringExtra(Constants.FLAG);
-            category = getIntent().getStringExtra("selected_category");
+            if (flag.equals("edit")) {
+                list = (ArrayList<NoteModel>) getIntent().getSerializableExtra(Constants.DATA);
+                noteModel = list.get(0);
+            } else {
+                category = getIntent().getStringExtra("selected_category");
+            }
+
         }
+
         init();
-        spCategory.setVisibility(View.GONE);
-        tvSpinner.setVisibility(View.GONE);
+
+        if (flag.equals("edit")) {
+
+            categoryList = dataBase.getAllCategories();
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(AddNotesActivity.this,
+                    android.R.layout.simple_spinner_item, categoryList);
+
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spCategory.setAdapter(adapter);
+            int pos = adapter.getPosition(noteModel.getCategory());
+            spCategory.setSelection(pos);
+            spCategory.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                    model.setCategory(String.valueOf(adapterView.getItemAtPosition(i)));
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> adapterView) {
+
+                }
+            });
+            titleET.setText(noteModel.getNote());
+            annotationET.setText(noteModel.getAnnotation());
+            tvToolBarTitle.setText("Edit Note");
+            if (noteModel.getImageOne() != null && !noteModel.getImageOne().equals("")) {
+                //Bitmap myBitmap = BitmapFactory.decodeFile(noteModel.getImageOne());
+                selectedIV.setImageURI(Uri.parse(noteModel.getImageOne()));
+                model.setImageOne(noteModel.getImageOne());
+                model.setImageTwo(noteModel.getImageTwo());
+            }
+
+            if (noteModel.getAudio() != null && !noteModel.getAudio().equals("")) {
+                selectedAudioTV.setVisibility(View.VISIBLE);
+                selectedAudio = noteModel.getAudio();
+                File file = new File(selectedAudio);
+                selectedAudioTV.setText(file.getName());
+            }
+
+            if (noteModel.getAudio() != null && !noteModel.getAudio().equals("")) {
+                model.setAudio(noteModel.getAudio());
+            }
+        } else {
+            spCategory.setVisibility(View.GONE);
+            tvSpinner.setVisibility(View.GONE);
+        }
     }
+
     private void init() {
         model = new NoteModel();
         model.setCategory(category);
@@ -105,24 +163,17 @@ public class AddNotesActivity extends AppCompatActivity implements View.OnClickL
         saveTV.setOnClickListener(this);
         ivBack.setOnClickListener(this);
     }
-    private String getCurrentTime() {
-        String formatedDate = "";
-        Date currentTime = Calendar.getInstance().getTime();
-        String newFormat = "dd-MM-yyyy hh:mm aaa";
-        SimpleDateFormat timeFormat = new SimpleDateFormat(newFormat);
-        formatedDate = timeFormat.format(currentTime);
-        //tvCurrentDateTime.setText(getString(R.string.text_current_time_is) + "  " + formatedDate)
-        return formatedDate;
-    }
-        @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
             case R.id.iv_back:
                 finish();
                 break;
             case R.id.cameraTV:
                 openBottomDialog();
                 break;
+
             case R.id.audioTV:
                 Intent intent_upload = new Intent();
                 intent_upload.setType("audio/*");
@@ -131,71 +182,33 @@ public class AddNotesActivity extends AppCompatActivity implements View.OnClickL
                 startActivityForResult(intent_upload, 1);
                 break;
             case R.id.saveTV:
-                if (titleET.getText().toString().isEmpty())
-                {
+                if (flag.equals("edit")) {
+                    if (titleET.getText().toString().isEmpty()) {
                         Toast.makeText(this, "Enter note title", Toast.LENGTH_LONG).show();
-                }
-                else if (annotationET.getText().toString().isEmpty())
-                {
+                    } else if (annotationET.getText().toString().isEmpty()) {
                         Toast.makeText(this, "Enter note annotation", Toast.LENGTH_LONG).show();
-                }
-                else
-                {
+                    } else {
+                        model.setNote(titleET.getText().toString());
+                        model.setAnnotation(annotationET.getText().toString());
+                        model.setLocation("" + userLat + " " + userLng);
+                        model.setDate(getCurrentTime());
+                        dataBase.updateNote(model, noteModel.getId());
+                        finish();
+                    }
+                } else {
+                    if (titleET.getText().toString().isEmpty()) {
+                        Toast.makeText(this, "Enter note title", Toast.LENGTH_LONG).show();
+                    } else if (annotationET.getText().toString().isEmpty()) {
+                        Toast.makeText(this, "Enter note annotation", Toast.LENGTH_LONG).show();
+                    } else {
                         model.setNote(titleET.getText().toString());
                         model.setAnnotation(annotationET.getText().toString());
                         dataBase.insertNote(model);
                         finish();
+                    }
                 }
-
                 break;
-
         }
-
-    }
-
-    private void openBottomDialog() {
-        final BottomSheetDialog dialog = new BottomSheetDialog(AddNotesActivity.this, R.style.bottom_dialog_theme);
-        dialog.setContentView(R.layout.dialog_add_attachment);
-        dialog.setCanceledOnTouchOutside(true);
-        dialog.show();
-        TextView tvCamera = dialog.findViewById(R.id.tv_camera);
-        TextView tvFromPhotos = dialog.findViewById(R.id.tv_photos);
-        TextView tvCancel = dialog.findViewById(R.id.tv_cancel);
-
-        tvCamera.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Options options = Options.init()
-                        .setRequestCode(REQUEST_CODE)                                           //Request code for activity results
-                        .setCount(2)                                                   //Number of images to restict selection count
-                        .setFrontfacing(false)           //Front Facing camera on start
-                        .setSpanCount(4)//Span count for gallery min 1 & max 5
-                        .setExcludeVideos(true)//Option to exclude videos
-                        .setVideoDurationLimitinSeconds(30)                            //Duration for video recording
-                        .setScreenOrientation(Options.SCREEN_ORIENTATION_PORTRAIT);     //Orientaion;                                       //Custom Path For media Storage
-
-                Pix.start(AddNotesActivity.this, options);
-                dialog.dismiss();
-            }
-        });
-        tvFromPhotos.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(i, Constants.PICK_IMAGE);
-                /*Intent intent = new Intent();
-                intent.setType("image/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(intent, "Select Picture"), Constants.PICK_IMAGE);*/
-                dialog.dismiss();
-            }
-        });
-        tvCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dialog.dismiss();
-            }
-        });
     }
 
     @Override
@@ -255,6 +268,15 @@ public class AddNotesActivity extends AppCompatActivity implements View.OnClickL
             }
         }
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mediaPlayer.isPlaying()) {
+            mediaPlayer.stop();
+        }
+    }
+
     public void setImages() {
         for (int i = 0; i < stringImages.size(); i++) {
             File imgFile = new File(stringImages.get(i));
@@ -272,6 +294,98 @@ public class AddNotesActivity extends AppCompatActivity implements View.OnClickL
             }
         }
     }
+
+    private String getCurrentTime() {
+        String formatedDate = "";
+        Date currentTime = Calendar.getInstance().getTime();
+        String newFormat = "dd-MM-yyyy hh:mm aaa";
+        SimpleDateFormat timeFormat = new SimpleDateFormat(newFormat);
+        formatedDate = timeFormat.format(currentTime);
+        //tvCurrentDateTime.setText(getString(R.string.text_current_time_is) + "  " + formatedDate)
+        return formatedDate;
+    }
+
+    private void openBottomDialog() {
+        final BottomSheetDialog dialog = new BottomSheetDialog(AddNotesActivity.this, R.style.bottom_dialog_theme);
+        dialog.setContentView(R.layout.dialog_add_attachment);
+        dialog.setCanceledOnTouchOutside(true);
+        dialog.show();
+        TextView tvCamera = dialog.findViewById(R.id.tv_camera);
+        TextView tvFromPhotos = dialog.findViewById(R.id.tv_photos);
+        TextView tvCancel = dialog.findViewById(R.id.tv_cancel);
+
+        tvCamera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Options options = Options.init()
+                        .setRequestCode(REQUEST_CODE)                                           //Request code for activity results
+                        .setCount(2)                                                   //Number of images to restict selection count
+                        .setFrontfacing(false)           //Front Facing camera on start
+                        .setSpanCount(4)//Span count for gallery min 1 & max 5
+                        .setExcludeVideos(true)//Option to exclude videos
+                        .setVideoDurationLimitinSeconds(30)                            //Duration for video recording
+                        .setScreenOrientation(Options.SCREEN_ORIENTATION_PORTRAIT);     //Orientaion;                                       //Custom Path For media Storage
+
+                Pix.start(AddNotesActivity.this, options);
+                dialog.dismiss();
+            }
+        });
+        tvFromPhotos.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(i, Constants.PICK_IMAGE);
+                /*Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(intent, "Select Picture"), Constants.PICK_IMAGE);*/
+                dialog.dismiss();
+            }
+        });
+        tvCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+    }
+
+    private String getRealPathFromURI(Context context, Uri contentUri) {
+
+        Cursor cursor = null;
+
+        try {
+
+            String[] proj = {
+                    MediaStore.Images.Media.DATA};
+
+            cursor = context.getContentResolver().query(contentUri, proj, null, null, null);
+
+            int column_index = cursor.getColumnIndexOrThrow(
+                    MediaStore.Images.Media.DATA);
+
+            cursor.moveToFirst();
+
+            return cursor.getString(column_index);
+
+        } catch (Exception e) {
+
+            Log.e("Path", "getRealPathFromURI Exception : " + e.toString());
+
+            return "";
+
+        } finally {
+
+            if (cursor != null) {
+
+                cursor.close();
+
+            }
+
+        }
+
+    }
+
     private String saveToInternalStorage(Bitmap bitmapImage) {
         //File directory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
         File directory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES).toString()
