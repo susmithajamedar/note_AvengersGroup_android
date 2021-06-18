@@ -1,9 +1,7 @@
 package com.example.note_avengersgroup_android;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
@@ -11,10 +9,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -24,14 +19,10 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.note_avengersgroup_android.models.NoteModel;
-import com.example.note_avengersgroup_android.utils.Constants;
-import com.example.note_avengersgroup_android.utils.DataBase;
-import com.example.note_avengersgroup_android.utils.GPSTracker;
+
 import com.fxn.pix.Options;
 import com.fxn.pix.Pix;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
-
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -45,6 +36,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
+import com.example.note_avengersgroup_android.utils.GPSTracker;
+import com.example.note_avengersgroup_android.utils.DataBase;
+import com.example.note_avengersgroup_android.models.NoteModel;
+import com.example.note_avengersgroup_android.utils.Constants;
 
 public class AddNotesActivity extends AppCompatActivity implements View.OnClickListener {
     TextView cameraTV, audioTV, selectedAudioTV, saveTV, tvSpinner;
@@ -133,6 +129,24 @@ public class AddNotesActivity extends AppCompatActivity implements View.OnClickL
                 intent_upload.setAction(Intent.ACTION_GET_CONTENT);
                 intent_upload.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
                 startActivityForResult(intent_upload, 1);
+                break;
+            case R.id.saveTV:
+                if (titleET.getText().toString().isEmpty())
+                {
+                        Toast.makeText(this, "Enter note title", Toast.LENGTH_LONG).show();
+                }
+                else if (annotationET.getText().toString().isEmpty())
+                {
+                        Toast.makeText(this, "Enter note annotation", Toast.LENGTH_LONG).show();
+                }
+                else
+                {
+                        model.setNote(titleET.getText().toString());
+                        model.setAnnotation(annotationET.getText().toString());
+                        dataBase.insertNote(model);
+                        finish();
+                }
+
                 break;
 
         }
